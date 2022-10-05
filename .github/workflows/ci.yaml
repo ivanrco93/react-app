@@ -1,9 +1,9 @@
 name: CI
 on:
   pull_request:
-    branches: [develop]
+    branches: [develop, main]
   push:
-    branches: [develop]
+    branches: [develop, main]
 
 jobs:
   build:
@@ -41,6 +41,11 @@ jobs:
       - name: Build project
         if: github.event_name == 'push'
         run: npm run build
+      - name: Create a Release
+        if: github.event_name == 'push' && gihub.ref == 'refs/heads/main'
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{secrets.GH_TOKEN}}
       - name: Deploy to stagin
         if: github.event_name == 'push'
         run: npx surge --project ./build --domain invincible-eggnog.surge.sh
